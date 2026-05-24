@@ -29,7 +29,7 @@ app = FastAPI(title="Scalable Data Processing API")
 #
 # Cons:
 #   - Runs inside the web server process — a crash in the task can affect the server
-#   - No task queue — 100 simultaneous requests = 100 joins running at once
+#   - No task queue if 100 simultaneous requests = 100 joins running at once
 #   - No built-in retry on failure
 #   - No way to poll task status without building it yourself
 # ─────────────────────────────────────────────────────────────────────────────

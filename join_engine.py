@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 # ── Config ────────────────────────────────────────────────────────────────────
 # NUM_BUCKETS: controls how many partitions we split the files into.
 # Each bucket must fit in RAM. With 256MB limit and ~500MB files, 10 buckets
-# means each bucket is ~50MB — well within the limit.
+# means each bucket is ~50MB.
 NUM_BUCKETS = 10
 CHUNK_SIZE  = 100_000       # rows read at a time from disk
 TEMP_DIR    = "data/temp_buckets"
@@ -21,7 +21,7 @@ RESULT_CSV  = "data/result.csv"
 
 
 def _get_bucket(user_id: int) -> int:
-    """Deterministic bucket assignment: same user_id always → same bucket."""
+    """Deterministic bucket assignment: same user_id always -> same bucket."""
     return int(user_id) % NUM_BUCKETS
 
 
@@ -69,11 +69,11 @@ def run_join() -> None:
     logger.info("=== Join job started ===")
     os.makedirs(TEMP_DIR, exist_ok=True)
 
-    # Step 1 & 2 — partition both files
+    # Step 1 & 2 : partition both files
     _partition(USERS_CSV, "users", "user_id")
     _partition(TRANS_CSV, "transactions", "user_id")
 
-    # Step 3 — join bucket by bucket
+    # Step 3 : join bucket by bucket
     logger.info("Joining buckets...")
     first_write = True
     total_rows  = 0
@@ -82,7 +82,7 @@ def run_join() -> None:
         u_path = os.path.join(TEMP_DIR, f"users_bucket_{bucket_id}.csv")
         t_path = os.path.join(TEMP_DIR, f"transactions_bucket_{bucket_id}.csv")
 
-        # A missing bucket just means no user_ids hashed to it — skip safely
+        # A missing bucket just means no user_ids hashed to it, skip safely
         if not os.path.exists(u_path) or not os.path.exists(t_path):
             logger.info(f"Bucket {bucket_id}: skipped (no matching rows)")
             continue
@@ -102,7 +102,7 @@ def run_join() -> None:
         first_write = False
         logger.info(f"Bucket {bucket_id}: {len(merged)} rows joined")
 
-    # Step 4 — cleanup temp files
+    # Step 4 : cleanup temp files
     for f in os.listdir(TEMP_DIR):
         os.remove(os.path.join(TEMP_DIR, f))
 
